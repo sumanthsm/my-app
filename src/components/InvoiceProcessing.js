@@ -26,7 +26,7 @@ export default class InvoiceProcessing extends React.Component {
             .then((response) => {
                 console.log(response, "res");
                 let data = response.data;
-                this.setState({ invoiceData: data });
+                this.setState({ invoiceData: data.result });
             })
             .catch(function (error) {
                 console.log(error);
@@ -37,7 +37,7 @@ export default class InvoiceProcessing extends React.Component {
         if (event.target.value === '') {
             this.getInvoiceData();
         }
-        this.setState({ invoiceNum: event.target.value, disableFilter: 'disabled' });
+        this.setState({ invoiceNum: event.target.value, disableFilter: 'disabled', comments: {} });
     }
 
     handleSort = (event) => {
@@ -48,7 +48,7 @@ export default class InvoiceProcessing extends React.Component {
         } else {
             this.getInvoiceDataByFilterName(invoiceFilterName);
         }
-        this.setState({ disableInput: 'disabled' });
+        this.setState({ comments: {}, disableInput: 'disabled' });
     }
 
     getInvoiceDataByID = () => {
@@ -115,6 +115,8 @@ export default class InvoiceProcessing extends React.Component {
         let selectedData = [],
             data = this.state.selected,
             status = this.state.status;
+        console.log(this.state.comments, "comments");
+        
 
         if (Object.keys(data).length > 0) {
             if (status != null) {
@@ -126,7 +128,7 @@ export default class InvoiceProcessing extends React.Component {
                     console.log(key, data[key]);
                 }
                 this.setInvoiceDataById(selectedData, this.state.status);
-                this.setState({ invoiceNum: '', disableFilter: false, disableInput: false, selected: {} });
+                this.setState({ invoiceNum: '', disableFilter: false, disableInput: false, selected: {}, comments: {} });
             } else {
                 Swal.fire({
                     type: 'error',
@@ -154,6 +156,16 @@ export default class InvoiceProcessing extends React.Component {
         });
     }
 
+    // handleBooks = () => {
+    //     axios.post('http://localhost:5000/books/add', { name: 'vignesh'})
+    //         .then((response) => {
+    //             console.log(response, "res");
+    //         })
+    //         .catch(function (error) {
+    //             console.log(error);
+    //         });
+    // }
+    
     render() {
         return (
             <div>
@@ -224,30 +236,32 @@ export default class InvoiceProcessing extends React.Component {
                             <tbody >
                                 {this.state.invoiceData != null ?
                                     this.state.invoiceData.map((invoice, i) => {
+                                        let record = invoice.Record;
                                         return (
                                             <tr key={i} >
                                                 <td style={{width: '50px'}}><input
                                                     type="checkbox"
-                                                    key={`invoice${i}`}
-                                                    id={invoice.id}
-                                                    onChange={() => this.onOptionChange(invoice.id)}
-                                                    checked={this.state.selected[invoice.id] === true} />
+                                                    key={record.invoiceNo}
+                                                    id={record.invoiceNo}
+                                                    onChange={() => this.onOptionChange(record.invoiceNo)}
+                                                    checked={this.state.selected[record.invoiceNo] === true} />
                                                 </td>
-                                                <td style={{width: '120px'}}>{invoice.id}</td>
-                                                <td style={{width: '140px'}}>{invoice.Invoice_Date}</td>
-                                                <td style={{width: '295px'}}>{invoice.Invoice_name}</td>
-                                                <td style={{width: '255px'}}>{invoice.Line_of_business}</td>
-                                                <td style={{width: '95px'}}>{invoice.Quantity}</td>
-                                                <td style={{width: '69px'}}>{invoice.Price}</td>
-                                                <td style={{width: '100px'}}>{invoice.Status}</td>
+                                                <td style={{width: '120px'}}>{record.invoiceNo}</td>
+                                                <td style={{width: '140px'}}>{record.invoiceDate}</td>
+                                                <td style={{width: '295px'}}>{record.invoiceName}</td>
+                                                <td style={{width: '255px'}}>{record.lob}</td>
+                                                <td style={{width: '95px'}}>{record.quantity}</td>
+                                                <td style={{width: '69px'}}>{record.price}</td>
+                                                <td style={{width: '100px'}}>{record.status}</td>
                                                 <td >
                                                     <input
                                                         type="text"
+                                                        key={record.invoiceNo}
                                                         className="form-control"
-                                                        id="comments"
+                                                        id={record.invoiceNo}
                                                         placeholder="Enter comments here"
-                                                        name="comments"
-                                                        onChange={(e) => this.addComments(invoice.id, e)} />
+                                                        value={this.state.comments[record.invoiceNo]}
+                                                        onChange={(e) => this.addComments(record.invoiceNo, e)} />
                                                 </td>
                                             </tr>
                                         )

@@ -4,13 +4,17 @@ var cors = require('cors');
 const json2csv = require('json2csv').parse;
 var csvjson = require('csvjson');
 var fs = require('fs');
+// var nano = require('nano')('http://localhost:5984');
+//couch db creation
+// nano.db.create('books');
+// var books = nano.db.use('books');
 const app = express();
 const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-function convertToJson(){
+function convertToJson() {
     let csvData = [];
     var options = {
         delimiter: ',', // optional
@@ -22,8 +26,39 @@ function convertToJson(){
 }
 
 app.get('/api/invoice', (req, res) => {
-    const data = convertToJson();
-    res.json(data);
+    // const data = convertToJson();
+    const data = [
+        {
+            Key: '12345',
+            Record: {
+                docType: 'invoice',
+                invoiceDate: '03-15-2019',
+                invoiceName: 'Caregaps',
+                invoiceNo: '12345',
+                lob: 'provider',
+                message: 'Please approve',
+                price: '1000000',
+                quantity: '10000',
+                status: 'Pending'
+            }
+        },
+        {
+            Key: '123',
+            Record: {
+                docType: 'invoice',
+                invoiceDate: '03-12-2019',
+                invoiceName: 'Caregaps1',
+                invoiceNo: '123',
+                lob: 'provider1',
+                message: 'Please approve',
+                price: '1000000',
+                quantity: '10000',
+                status: 'Pending'
+            }
+        },
+    ]
+
+    res.json({'success': true, result: data});
 });
 
 app.get('/api/invoice:id', (req, res) => {
@@ -69,7 +104,7 @@ app.post('/api/invoice', (req, res) => {
             throw err;
         }
     });
-    res.json({'status': 'success'});
+    res.json({ 'status': 'success' });
 });
 
 app.post('/api/createinvoice', (req, res) => {
@@ -78,28 +113,43 @@ app.post('/api/createinvoice', (req, res) => {
     let flag = 0;
     let jsonData = convertToJson();
     const newInvoiceData = req.body.data;
-    for(let i=0;i<jsonData.length;i++){
-        if(jsonData[i]['id'] === newInvoiceData['id']){
+    for (let i = 0; i < jsonData.length; i++) {
+        if (jsonData[i]['id'] === newInvoiceData['id']) {
             flag = 1;
             break;
         }
     }
 
-    if(flag === 0){
+    if (flag === 0) {
         console.log("flag true");
-        
+
         jsonData.push(newInvoiceData);
         fs.writeFile("./assets/mock-data.csv", json2csv(jsonData, opts), function (err) {
             if (err) {
                 throw err;
             }
         });
-        res.json({'status': 'success'});
-    }else{
+        res.json({ 'status': 'success' });
+    } else {
         console.log("flag false");
-        res.json({'status': 'fail'});
+        res.json({ 'status': 'fail' });
     }
 });
 
+// app.post('/books/add', function (req, res) {
+//     const bookName = "Couch DB";
+//     const author = "apache";
+
+//     // Insert a book document in the books database
+//     books.insert({ name: bookName, author: author }, null, function (err, body) {
+//         if (err) {
+//             console.log(err)
+//         } else {
+//             console.log(body)
+//         }
+//     })
+
+// });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
