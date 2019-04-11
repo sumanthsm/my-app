@@ -58,7 +58,7 @@ app.get('/api/invoice', (req, res) => {
         },
     ]
 
-    res.json({'success': true, result: data});
+    res.json({ 'success': true, result: data });
 });
 
 app.get('/api/invoice:id', (req, res) => {
@@ -136,20 +136,49 @@ app.post('/api/createinvoice', (req, res) => {
     }
 });
 
-// app.post('/books/add', function (req, res) {
-//     const bookName = "Couch DB";
-//     const author = "apache";
+app.post('/createInvoice', (req, res) => {
+    let data = req.body.data;
+    axios.post('http://ibmapi/invoices', data)
+        .then((response) => {
+            res.send(response.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 
-//     // Insert a book document in the books database
-//     books.insert({ name: bookName, author: author }, null, function (err, body) {
-//         if (err) {
-//             console.log(err)
-//         } else {
-//             console.log(body)
-//         }
-//     })
+})
 
-// });
+app.post('/approveInvoice', (req, res) => {
+    let invoiceData = [], result = [];
+    let flag = 0;
+    const selectedData = req.body.data;
+    axios.get('http://ibmapi/invoices')
+        .then((response) => {
+            this.invoiceData = response.data.result;
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+        for (let i = 0; i < selectedData.length; i++) {
+            for (let j = 0; j < invoiceData.length; j++) {
+                if (invoiceData[j]['invoiceNo'] === selectedData[i]['invoiceNo']) {
+                    invoiceData[i]['Status'] = req.body.status;
+                    result.push(invoiceData[j]);
+                } else {
+                    result.push(invoiceData[j]);
+                }
+            }
+        }
+
+    axios.post('http://ibmapi/invoices', result)
+        .then((response) => {
+            res.send(response.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+})
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 

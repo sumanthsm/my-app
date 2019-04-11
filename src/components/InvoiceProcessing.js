@@ -76,7 +76,7 @@ export default class InvoiceProcessing extends React.Component {
     }
 
     setInvoiceDataById = (data, status) => {
-        axios.post('http://localhost:5000/api/invoice', { data: data, status: status })
+        axios.post('http://localhost:5000/approveInvoice', { data: data, status: status })
             .then((response) => {
                 if (response.data.status === 'success') {
                     // this.setState({isLoaded : true})
