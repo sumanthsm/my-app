@@ -49,7 +49,7 @@ export default class CreateInvoice extends React.Component {
                         invoiceQuantity: '',
                         invoicePrice: ''
                     })
-                }else if (response.data.status === 'fail') {
+                } else if (response.data.status === 'fail') {
                     Swal.fire({
                         type: 'error',
                         title: 'Oops...',
@@ -77,52 +77,55 @@ export default class CreateInvoice extends React.Component {
     render() {
         return (
             <div>
-                <div className="container-fluid">
-                    <div style={{ fontSize: '18px', fontWeight: '600', paddingTop: '15px' }}>Create Invoice</div>
-                </div>
-                <hr />
-                <div className="container-fluid">
-                    <form style={{ marginLeft: '30px' }}>
-                        <div className="form-group row">
-                            <label htmlFor="invoiceNumber" className="col-sm-2 col-form-label">Invoice Number</label>
-                            <div className="col-lg-3">
-                                <input type="text" className="form-control" id="invoiceNumber" value={this.state.invoiceNumber} onChange={this.handleChange} />
+                <div className="container">
+                    <div className="card" style={{margin: '50px auto', width: '80%', height: 'auto'}}>
+                        <div className="card-body">
+                            <h4 className="card-title" >Create Invoice</h4>
+                            <hr />
+                            <form style={{ marginLeft: '30px' }}>
+                                <div className="form-group row">
+                                    <label htmlFor="invoiceNumber" className="col-3 col-form-label">Invoice Number</label>
+                                    <div className="col-4">
+                                        <input type="text" className="form-control" id="invoiceNumber" value={this.state.invoiceNumber} onChange={this.handleChange} />
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label htmlFor="invoiceDate" className="col-3 col-form-label">Invoice Date</label>
+                                    <div className="col-4">
+                                        <input type="date" className="form-control" id="invoiceDate" value={this.state.invoiceDate} onChange={this.handleChange} />
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label htmlFor="invoiceName" className="col-3 col-form-label">Invoice Name</label>
+                                    <div className="col-4">
+                                        <input type="text" className="form-control" id="invoiceName" value={this.state.invoiceName} onChange={this.handleChange} />
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label htmlFor="invoiceLob" className="col-3 col-form-label">Line Of Business(LOB)</label>
+                                    <div className="col-4">
+                                        <input type="text" className="form-control" id="invoiceLob" value={this.state.invoiceLob} onChange={this.handleChange} />
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label htmlFor="invoiceQuantity" className="col-3 col-form-label">Quantity</label>
+                                    <div className="col-4">
+                                        <input type="number" className="form-control" id="invoiceQuantity" value={this.state.invoiceQuantity} onChange={this.handleChange} />
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label htmlFor="invoicePrice" className="col-3 col-form-label">Price</label>
+                                    <div className="col-4">
+                                        <input type="text" className="form-control" id="invoicePrice" value={this.state.invoicePrice} onChange={this.handleChange} />
+                                    </div>
+                                </div>
+                            </form>
+                            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                                <button type="button" className="btn btn-primary" onClick={this.handleSubmit} >Submit</button>
                             </div>
                         </div>
-                        <div className="form-group row">
-                            <label htmlFor="invoiceDate" className="col-sm-2 col-form-label">Invoice Date</label>
-                            <div className="col-lg-3">
-                                <input type="date" className="form-control" id="invoiceDate" value={this.state.invoiceDate} onChange={this.handleChange} />
-                            </div>
-                        </div>
-                        <div className="form-group row">
-                            <label htmlFor="invoiceName" className="col-sm-2 col-form-label">Invoice Name</label>
-                            <div className="col-lg-3">
-                                <input type="text" className="form-control" id="invoiceName" value={this.state.invoiceName} onChange={this.handleChange} />
-                            </div>
-                        </div>
-                        <div className="form-group row">
-                            <label htmlFor="invoiceLob" className="col-sm-2 col-form-label">Line Of Business(LOB)</label>
-                            <div className="col-lg-3">
-                                <input type="text" className="form-control" id="invoiceLob" value={this.state.invoiceLob} onChange={this.handleChange} />
-                            </div>
-                        </div>
-                        <div className="form-group row">
-                            <label htmlFor="invoiceQuantity" className="col-sm-2 col-form-label">Quantity</label>
-                            <div className="col-lg-3">
-                                <input type="number" className="form-control" id="invoiceQuantity" value={this.state.invoiceQuantity} onChange={this.handleChange} />
-                            </div>
-                        </div>
-                        <div className="form-group row">
-                            <label htmlFor="invoicePrice" className="col-sm-2 col-form-label">Price</label>
-                            <div className="col-lg-3">
-                                <input type="text" className="form-control" id="invoicePrice" value={this.state.invoicePrice} onChange={this.handleChange} />
-                            </div>
-                        </div>
-                    </form>
-                    <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                        <button type="button" className="btn btn-primary" onClick={this.handleSubmit} >Submit</button>
                     </div>
+                    {/* <div style={{ fontSize: '18px', fontWeight: '600', paddingTop: '15px' }}>Create Invoice</div> */}
                 </div>
             </div>
         );

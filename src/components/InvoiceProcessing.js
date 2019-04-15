@@ -116,7 +116,7 @@ export default class InvoiceProcessing extends React.Component {
             data = this.state.selected,
             status = this.state.status;
         console.log(this.state.comments, "comments");
-        
+
 
         if (Object.keys(data).length > 0) {
             if (status != null) {
@@ -155,135 +155,123 @@ export default class InvoiceProcessing extends React.Component {
             comments: newComment
         });
     }
-
-    // handleBooks = () => {
-    //     axios.post('http://localhost:5000/books/add', { name: 'vignesh'})
-    //         .then((response) => {
-    //             console.log(response, "res");
-    //         })
-    //         .catch(function (error) {
-    //             console.log(error);
-    //         });
-    // }
-    
     render() {
         return (
             <div>
                 <div className="container-fluid">
-                    <div style={{ fontSize: '18px', fontWeight: '600', paddingTop: '15px' }}>INVOICE PROCESSING</div>
-                </div>
-                <hr />
-                <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-lg-6 col-md-4">
-                            <form className="form-inline">
-                                <div className="input-group" style={{ margin: '0px 0px 0px auto' }}>
-                                    <label htmlFor="invoicenumber" className="mb-2 mr-sm-2">Invoice No:</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="invoicenumber"
-                                        placeholder="Invoice Number"
-                                        name="invoicenumber"
-                                        disabled={this.state.disableInput}
-                                        onChange={this.handleChange} />
-                                    <div className="input-group-append">
-                                        <button
-                                            className="btn btn-primary"
-                                            type="button"
-                                            onClick={this.getInvoiceDataByID}
-                                        >Go</button>
+                    <div className="card" style={{ margin: '50px auto'}}>
+                        <div className="card-body">
+                            <h4 className="card-title" >INVOICE PROCESSING</h4>
+                            <hr />
+                            <div className="row">
+                                <div className="col-lg-6 col-md-4">
+                                    <form className="form-inline">
+                                        <div className="input-group" style={{ margin: '0px 0px 0px auto' }}>
+                                            <label htmlFor="invoicenumber" className="mb-2 mr-sm-2">Invoice No:</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="invoicenumber"
+                                                placeholder="Invoice Number"
+                                                name="invoicenumber"
+                                                disabled={this.state.disableInput}
+                                                onChange={this.handleChange} />
+                                            <div className="input-group-append">
+                                                <button
+                                                    className="btn btn-primary"
+                                                    type="button"
+                                                    onClick={this.getInvoiceDataByID}
+                                                >Go</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div className="col-lg-6 col-md-4">
+                                    <form className="form-inline">
+                                        <div className="input-group">
+                                            <label htmlFor="sortby" className="mb-2 mr-sm-2">Search by:</label>
+                                            <select id="sortby" className="form-control" disabled={this.state.disableFilter} onChange={this.handleSort}>
+                                                <option>Status</option>
+                                                <option>All</option>
+                                                <option>Open</option>
+                                                <option>Approved</option>
+                                                <option>Disputed</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '30px' }}>
+                                <table className="table table-bordered">
+                                    <thead className="thead-light">
+                                        <tr>
+                                            <th style={{ width: '50px' }}></th>
+                                            <th style={{ width: '120px' }}>Invoice No.</th>
+                                            <th style={{ width: '140px' }}>Invoice Date</th>
+                                            <th style={{ width: '295px' }}>Invoice Name</th>
+                                            <th style={{ width: '255px' }}>LoB</th>
+                                            <th style={{ width: '95px' }}>Quantity</th>
+                                            <th style={{ width: '90px' }}>Price</th>
+                                            <th style={{ width: '100px' }}>Status</th>
+                                            <th >Comments</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div style={{ marginTop: '-15px', maxHeight: '300px', overflowY: 'auto', borderBottom: '1px solid #dee2e6' }}>
+                                <table className="table table-bordered" style={{margin: '0px'}}>
+                                    <tbody >
+                                        {this.state.invoiceData != null ?
+                                            this.state.invoiceData.map((invoice, i) => {
+                                                let record = invoice.Record;
+                                                return (
+                                                    <tr key={i} >
+                                                        <td style={{ width: '50px' }}><input
+                                                            type="checkbox"
+                                                            key={record.invoiceNo}
+                                                            id={record.invoiceNo}
+                                                            onChange={() => this.onOptionChange(record.invoiceNo)}
+                                                            checked={this.state.selected[record.invoiceNo] === true} />
+                                                        </td>
+                                                        <td style={{ width: '120px' }}>{record.invoiceNo}</td>
+                                                        <td style={{ width: '140px' }}>{record.invoiceDate}</td>
+                                                        <td style={{ width: '295px' }}>{record.invoiceName}</td>
+                                                        <td style={{ width: '255px' }}>{record.lob}</td>
+                                                        <td style={{ width: '95px' }}>{record.quantity}</td>
+                                                        <td style={{ width: '90px' }}>{record.price}</td>
+                                                        <td style={{ width: '100px' }}>{record.status}</td>
+                                                        <td >
+                                                            <input
+                                                                type="text"
+                                                                key={record.invoiceNo}
+                                                                className="form-control"
+                                                                id={record.invoiceNo}
+                                                                placeholder="Enter comments here"
+                                                                value={this.state.comments[record.invoiceNo]}
+                                                                onChange={(e) => this.addComments(record.invoiceNo, e)} />
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                            : ""
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="col-lg-12 mt-5 mb-3">
+                                <div className="row">
+                                    <div className="col-lg-6" style={{ textAlign: 'right' }}>
+                                        <select id="statuschange" className="form-control" style={{ width: 'auto', margin: '0 0 0 auto' }} onChange={this.handleStatusChange}>
+                                            <option>Change Status</option>
+                                            <option>Open</option>
+                                            <option>Approved</option>
+                                            <option>Disputed</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-lg-6">
+                                        <button type="button" className="btn btn-primary ml-2 mr-2" onClick={this.handleSubmit} >Submit</button>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-                        <div className="col-lg-6 col-md-4">
-                            <form className="form-inline">
-                                <div className="input-group">
-                                    <label htmlFor="sortby" className="mb-2 mr-sm-2">Search by:</label>
-                                    <select id="sortby" className="form-control" disabled={this.state.disableFilter} onChange={this.handleSort}>
-                                        <option>Status</option>
-                                        <option>All</option>
-                                        <option>Open</option>
-                                        <option>Approved</option>
-                                        <option>Disputed</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-
-                    </div>
-                    <div style={{ margin: ' 30px 30px 0px 30px' }}>
-                        <table className="table table-bordered">
-                        <thead className="thead-light">
-                                <tr>
-                                <th style={{width: '50px'}}></th>
-                                        <th style={{width: '120px'}}>Invoice No.</th>
-                                        <th style={{width: '140px'}}>Invoice Date</th>
-                                        <th style={{width: '295px'}}>Invoice Name</th>
-                                        <th style={{width: '255px'}}>LoB</th>
-                                        <th style={{width: '95px'}}>Quantity</th>
-                                        <th style={{width: '69px'}}>Price</th>
-                                        <th style={{width: '100px'}}>Status</th>
-                                        <th >Comments</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <div style={{ margin: '-15px 30px 0px 30px', height: '300px', overflowY: 'auto', borderBottom: '1px solid #dee2e6' }}>
-                        <table className="table table-bordered">
-                            
-                            <tbody >
-                                {this.state.invoiceData != null ?
-                                    this.state.invoiceData.map((invoice, i) => {
-                                        let record = invoice.Record;
-                                        return (
-                                            <tr key={i} >
-                                                <td style={{width: '50px'}}><input
-                                                    type="checkbox"
-                                                    key={record.invoiceNo}
-                                                    id={record.invoiceNo}
-                                                    onChange={() => this.onOptionChange(record.invoiceNo)}
-                                                    checked={this.state.selected[record.invoiceNo] === true} />
-                                                </td>
-                                                <td style={{width: '120px'}}>{record.invoiceNo}</td>
-                                                <td style={{width: '140px'}}>{record.invoiceDate}</td>
-                                                <td style={{width: '295px'}}>{record.invoiceName}</td>
-                                                <td style={{width: '255px'}}>{record.lob}</td>
-                                                <td style={{width: '95px'}}>{record.quantity}</td>
-                                                <td style={{width: '69px'}}>{record.price}</td>
-                                                <td style={{width: '100px'}}>{record.status}</td>
-                                                <td >
-                                                    <input
-                                                        type="text"
-                                                        key={record.invoiceNo}
-                                                        className="form-control"
-                                                        id={record.invoiceNo}
-                                                        placeholder="Enter comments here"
-                                                        value={this.state.comments[record.invoiceNo]}
-                                                        onChange={(e) => this.addComments(record.invoiceNo, e)} />
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                    : ""
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                   
-                    <div className="col-lg-12 mt-3 mb-3">
-                        <div className="row" >
-                            <div className="col-lg-6" style={{ textAlign: 'right' }}>
-                                <select id="statuschange" className="form-control" style={{ width: 'auto', margin: '0 0 0 auto' }} onChange={this.handleStatusChange}>
-                                    <option>Change Status</option>
-                                    <option>Open</option>
-                                    <option>Approved</option>
-                                    <option>Disputed</option>
-                                </select>
-                            </div>
-                            <div className="col-lg-6">
-                                <button type="button" className="btn btn-primary ml-2 mr-2" onClick={this.handleSubmit} >Submit</button>
                             </div>
                         </div>
                     </div>
