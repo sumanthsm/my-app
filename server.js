@@ -1,13 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 var cors = require('cors');
+var axios = require('axios');
 const json2csv = require('json2csv').parse;
 var csvjson = require('csvjson');
 var fs = require('fs');
-// var nano = require('nano')('http://localhost:5984');
-//couch db creation
-// nano.db.create('books');
-// var books = nano.db.use('books');
 const app = express();
 const port = process.env.PORT || 5000;
 app.use(cors());
@@ -26,215 +23,40 @@ function convertToJson() {
 }
 
 app.get('/api/invoice', (req, res) => {
-    // const data = convertToJson();
-    const data = [
-        {
-            Key: '12345',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-15-2019',
-                invoiceName: 'Caregaps',
-                invoiceNo: '12345',
-                lob: 'provider',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '123',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1235',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1223',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1283',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-        {
-            Key: '1203',
-            Record: {
-                docType: 'invoice',
-                invoiceDate: '03-12-2019',
-                invoiceName: 'Caregaps1',
-                invoiceNo: '123',
-                lob: 'provider1',
-                message: 'Please approve',
-                price: '1000000',
-                quantity: '10000',
-                status: 'Pending'
-            }
-        },
-    ]
-
-    res.json({ 'success': true, result: data });
+    const data = convertToJson();
+    res.json(data);
 });
 
-app.get('/api/invoice:id', (req, res) => {
-    let result = [];
-    let csvData = convertToJson();
-    for (let i = 0; i < csvData.length; i++) {
-        if (csvData[i].id === req.params.id) {
-            result.push(csvData[i]);
-        }
-    }
-    res.json(result);
-});
+// app.get('/api/invoice:id', (req, res) => {
+//     let result = [];
+//     let csvData = convertToJson();
+//     for (let i = 0; i < csvData.length; i++) {
+//         if (csvData[i].id === req.params.id) {
+//             result.push(csvData[i]);
+//         }
+//     }
+//     res.json(result);
+// });
 
 app.get('/api/filterbystatus:status', (req, res) => {
-    let result = [];
-    let csvData = convertToJson();
-    for (let i = 0; i < csvData.length; i++) {
-        if (csvData[i]['Status'] === req.params.status) {
-            result.push(csvData[i]);
-        }
-    }
-    res.json(result);
+
+    axios.get('http://fb-invoice-reconciliation-api.mybluemix.net/invoices')
+
+        .then((response) => {
+            let result = [];
+            invoiceData = response.data.result;
+            for (let i = 0; i < invoiceData.length; i++) {
+                if (invoiceData[i]['Record']['status'] === req.params.status) {
+                    result.push(invoiceData[i]);
+                }
+            }
+            res.send(result);
+
+        })
+        .catch((error) => {
+            res.send(error);
+        })
+
 });
 
 app.post('/api/invoice', (req, res) => {
@@ -275,7 +97,6 @@ app.post('/api/createinvoice', (req, res) => {
     }
 
     if (flag === 0) {
-        console.log("flag true");
 
         jsonData.push(newInvoiceData);
         fs.writeFile("./assets/mock-data.csv", json2csv(jsonData, opts), function (err) {
@@ -285,54 +106,139 @@ app.post('/api/createinvoice', (req, res) => {
         });
         res.json({ 'status': 'success' });
     } else {
-        console.log("flag false");
         res.json({ 'status': 'fail' });
     }
 });
 
-app.post('/createInvoice', (req, res) => {
-    let data = req.body.data;
-    axios.post('http://ibmapi/invoices', data)
+
+app.get("/invoices", (req, res) => {
+    axios.get("http://fb-invoice-reconciliation-api.mybluemix.net/invoices")
+        .then(({ data }) => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).json({ errormessage: err.message });
+        });
+});
+
+//createinvoice post method
+app.post("/createInvoice", (req, res) => {
+    axios.post("https://fb-invoice-reconciliation-api.mybluemix.net/createInvoice", req.body)
         .then((response) => {
             res.send(response.data);
         })
         .catch(function (error) {
-            console.log(error);
         });
+});
 
-})
+
+app.get('/api/invoice:id', (req, res) => {
+
+    console.log(req.params.id,"Request params...");
+    axios.get("http://fb-invoice-reconciliation-api.mybluemix.net/getinvoice?invoiceNo="+req.params.id)
+        .then((response) => {
+            console.log(response,"Response by ID....");
+            
+            res.send(response.data);
+        })
+        .catch(err => {
+            res.status(500).json({ errormessage: err.message });
+        });
+});
 
 app.post('/approveInvoice', (req, res) => {
-    let invoiceData = [], result = [];
-    let flag = 0;
-    const selectedData = req.body.data;
-    axios.get('http://ibmapi/invoices')
+    let invoiceData = [];
+
+    const invoiceNo = req.body.invoiceNo;
+    axios.get('http://fb-invoice-reconciliation-api.mybluemix.net/invoices')
         .then((response) => {
-            this.invoiceData = response.data.result;
+            invoiceData = response.data.result;
+            let result = approveInvoice(invoiceData, invoiceNo, req.body.status);
+            res.send(result);
         })
         .catch((error) => {
-            console.log(error);
+            res.send(error);
         })
-        for (let i = 0; i < selectedData.length; i++) {
-            for (let j = 0; j < invoiceData.length; j++) {
-                if (invoiceData[j]['invoiceNo'] === selectedData[i]['invoiceNo']) {
-                    invoiceData[i]['Status'] = req.body.status;
-                    result.push(invoiceData[j]);
-                } else {
-                    result.push(invoiceData[j]);
-                }
-            }
-        }
-
-    axios.post('http://ibmapi/invoices', result)
-        .then((response) => {
-            res.send(response.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
 
 })
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+//disputeInvoice
 
+app.post('/disputeInvoice', (req, res) => {
+    let invoiceData = [];
+
+    const invoiceNo = req.body.invoiceNo;
+    axios.get('http://fb-invoice-reconciliation-api.mybluemix.net/invoices')
+        .then((response) => {
+            invoiceData = response.data.result;
+            let result = disputeInvoice(invoiceData, invoiceNo, req.body.status);
+            res.send(result);
+        })
+        .catch((error) => {
+            res.send(error);
+        })
+
+})
+
+
+
+
+
+function approveInvoice(invoiceData, invoiceNo, status) {
+
+    for (let i = 0; i < invoiceData.length; i++) {
+
+        if (invoiceData[i]['Record']['invoiceNo'] == invoiceNo) {
+            invoiceData[i]['Record']['status'] = status;
+
+            axios({
+                method: 'post',
+                url: 'http://fb-invoice-reconciliation-api.mybluemix.net/approveInvoice',
+                data: invoiceData[i]['Record'],
+                config: { headers: { 'Content-Type': 'multipart/form-data' } }
+            })
+                .then(response => {
+                    // return response.data;
+                    res.send(response);
+                })
+                .catch(function (error) {
+
+                    return error;
+                });
+            break;
+        }
+
+    }
+
+}
+
+
+function disputeInvoice(invoiceData, invoiceNo, status) {
+
+    for (let i = 0; i < invoiceData.length; i++) {
+
+        if (invoiceData[i]['Record']['invoiceNo'] == invoiceNo) {
+            invoiceData[i]['Record']['status'] = status;
+
+            axios({
+                method: 'post',
+                url: 'http://fb-invoice-reconciliation-api.mybluemix.net/disputeInvoice',
+                data: invoiceData[i]['Record'],
+                config: { headers: { 'Content-Type': 'multipart/form-data' } }
+            })
+                .then(response => {
+                    // return response.data;
+                    res.send(response);
+                })
+                .catch(function (error) {
+
+                    return error;
+                });
+            break;
+        }
+
+    }
+
+}
+
+app.listen(port, () => console.log(`Listening on port ${port}`));
