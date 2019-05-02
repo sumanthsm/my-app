@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2'
 
+
 export default class CreateInvoice extends React.Component {
     constructor(props) {
         super(props);
@@ -12,6 +13,7 @@ export default class CreateInvoice extends React.Component {
             invoiceLob: null,
             invoiceQuantity: null,
             invoicePrice: null
+            // invoiceMessage:null
         }
     }
 
@@ -29,12 +31,18 @@ export default class CreateInvoice extends React.Component {
         } else if (e.target.id === 'invoicePrice') {
             this.setState({ invoicePrice: e.target.value });
         }
+        // else if (e.target.id === 'invoiceMessage') {
+        //     this.setState({ invoiceMessage: e.target.value });
+        // }
     }
 
     setInvoiceData = (data) => {
-        axios.post('http://localhost:5000/api/createinvoice', { data: data })
+        // console.log(data);
+        axios.post('http://localhost:5000/createInvoice', data)
             .then((response) => {
-                if (response.data.status === 'success') {
+
+                // console.log(response.data.status,"Swal Confirm");
+                if (response.status === 200) {
                     Swal.fire({
                         type: 'success',
                         title: 'Invoice created successfully.',
@@ -48,12 +56,13 @@ export default class CreateInvoice extends React.Component {
                         invoiceLob: '',
                         invoiceQuantity: '',
                         invoicePrice: ''
+                        // invoiceMessage:''
                     })
                 } else if (response.data.status === 'fail') {
                     Swal.fire({
                         type: 'error',
                         title: 'Oops...',
-                        text: 'Invoice number is already exist.',
+                        text: 'Invoice number already exist.',
                     })
                 }
             })
@@ -63,22 +72,31 @@ export default class CreateInvoice extends React.Component {
     }
 
     handleSubmit = (e) => {
-        let invoiceObj = {};
-        invoiceObj['id'] = this.state.invoiceNumber;
-        invoiceObj['Invoice_Date'] = this.state.invoiceDate;
-        invoiceObj['Invoice_name'] = this.state.invoiceName;
-        invoiceObj['Line_of_business'] = this.state.invoiceLob;
-        invoiceObj['Price'] = this.state.invoicePrice;
-        invoiceObj['Quantity'] = this.state.invoiceQuantity;
-        invoiceObj['Status'] = 'Open';
-        this.setInvoiceData(invoiceObj);
+
+        // let invoiceObj = {};
+        let recordObj = {};
+        // invoiceObj['Key'] = this.state.invoiceNumber;
+        // recordObj['docType'] = "invoice";       
+        recordObj['invoiceNo'] = this.state.invoiceNumber;
+        recordObj['invoiceName'] = this.state.invoiceName;
+        recordObj['invoiceDate'] = this.state.invoiceDate;
+        recordObj['lob'] = this.state.invoiceLob;
+        // recordObj['message']=this.state.invoiceMessage;
+        recordObj['quantity'] = this.state.invoiceQuantity;
+        recordObj['price'] = this.state.invoicePrice;
+
+        // recordObj['status'] = 'Open';
+
+        // invoiceObj['Record'] = recordObj;
+
+        this.setInvoiceData(recordObj);
     }
 
     render() {
         return (
             <div>
                 <div className="container">
-                    <div className="card" style={{margin: '50px auto', width: '80%', height: 'auto'}}>
+                    <div className="card" style={{ margin: '50px auto', width: '90%', height: 'auto' }}>
                         <div className="card-body">
                             <h4 className="card-title" >Create Invoice</h4>
                             <hr />
@@ -107,6 +125,12 @@ export default class CreateInvoice extends React.Component {
                                         <input type="text" className="form-control" id="invoiceLob" value={this.state.invoiceLob} onChange={this.handleChange} />
                                     </div>
                                 </div>
+                                {/* <div className="form-group row">
+                            <label htmlFor="invoiceMessage" className="col-3 col-form-label">Message</label>
+                            <div className="col-4">
+                                <input type="text" className="form-control" id="invoiceMessage" value={this.state.invoiceMessage} onChange={this.handleChange} />
+                            </div>
+                        </div> */}
                                 <div className="form-group row">
                                     <label htmlFor="invoiceQuantity" className="col-3 col-form-label">Quantity</label>
                                     <div className="col-4">
@@ -125,9 +149,9 @@ export default class CreateInvoice extends React.Component {
                             </div>
                         </div>
                     </div>
-                    {/* <div style={{ fontSize: '18px', fontWeight: '600', paddingTop: '15px' }}>Create Invoice</div> */}
                 </div>
             </div>
         );
+
     }
 }
