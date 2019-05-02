@@ -1,12 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2'
+// import { url } from 'inspector';
 
 export default class InvoiceProcessing extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            invoiceNum: 0,
+            invoiceNo: 0,
             invoiceData: null,
             disableFilter: '',
             disableInput: '',
@@ -21,23 +22,29 @@ export default class InvoiceProcessing extends React.Component {
         this.getInvoiceData();
     }
 
+
     getInvoiceData = () => {
-        axios.get('http://localhost:5000/api/invoice')
-            .then((response) => {
-                console.log(response, "res");
-                let data = response.data;
-                this.setState({ invoiceData: data.result });
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+
+        console.log("inside Get invoice Data..");
+
+        setTimeout(() => {
+            axios.get('http://localhost:5000/invoices')
+                .then((response) => {
+                    console.log(response.data.result, "response in getinvoice Data...");
+                    let data = response.data.result;
+                    this.setState({ invoiceData: data });
+                })
+                .catch(function (error) {
+                    console.log("error nessage ---->", error.message);
+                })
+        }, 2000);
     }
 
     handleChange = (event) => {
         if (event.target.value === '') {
             this.getInvoiceData();
         }
-        this.setState({ invoiceNum: event.target.value, disableFilter: 'disabled', comments: {} });
+        this.setState({ invoiceNo: event.target.value, disableFilter: 'disabled' });
     }
 
     handleSort = (event) => {
@@ -48,15 +55,22 @@ export default class InvoiceProcessing extends React.Component {
         } else {
             this.getInvoiceDataByFilterName(invoiceFilterName);
         }
-        this.setState({ comments: {}, disableInput: 'disabled' });
+        this.setState({ disableInput: 'disabled' });
     }
 
     getInvoiceDataByID = () => {
-        axios.get('http://localhost:5000/api/invoice' + this.state.invoiceNum)
+        axios.get('http://localhost:5000/api/invoice' + this.state.invoiceNo)
             .then((response) => {
-                console.log(response, "res");
-                let data = response.data;
-                this.setState({ invoiceData: data });
+                let result = [];
+                let invoiceObj ={};
+        
+                let data = JSON.parse(response.data.result);
+                invoiceObj['Key']=data.invoiceNo;
+                invoiceObj['Record']= data;
+                console.log(invoiceObj);
+                result.push(invoiceObj);
+
+                this.setState({ invoiceData: result });
             })
             .catch(function (error) {
                 console.log(error);
@@ -64,7 +78,12 @@ export default class InvoiceProcessing extends React.Component {
     }
 
     getInvoiceDataByFilterName = (invoiceFilterName) => {
-        axios.get('http://localhost:5000/api/filterbystatus' + invoiceFilterName)
+        let filterName = invoiceFilterName;
+        if(filterName == 'Disputed'){
+            filterName = "Not Approved";
+
+        }
+        axios.get('http://localhost:5000/api/filterbystatus' + filterName)
             .then((response) => {
                 console.log(response, "res");
                 let data = response.data;
@@ -76,25 +95,43 @@ export default class InvoiceProcessing extends React.Component {
     }
 
     setInvoiceDataById = (data, status) => {
-        axios.post('http://localhost:5000/approveInvoice', { data: data, status: status })
-            .then((response) => {
-                if (response.data.status === 'success') {
-                    // this.setState({isLoaded : true})
-                    this.getInvoiceData();
-                    Swal.fire({
-                        type: 'success',
-                        title: 'Data submitted successfully.',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                }
-                console.log(response, "res");
-                // let data = response.data;
-                // this.setState({ invoiceData: data });
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        let url = "";
+        if (status === "Approved") {
+            url = "http://localhost:5000/approveInvoice";
+
+        } else if (status === "Disputed") {
+            url = "http://localhost:5000/disputeInvoice";
+        }
+        console.log(url);
+
+        for (let i = 0; i < data.length; i++) {
+
+            axios.post(url, { invoiceNo: data[i].id, status: status })
+                .then((response) => {
+                    console.log(response, "SetInvoiceData By ID.....");
+                    if (response.status == 200) {
+                        // this.setState({isLoaded : true})
+
+
+                        this.getInvoiceData();
+                        Swal.fire({
+                            type: 'success',
+                            title: 'Data submitted successfully.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        //    setTimeout(this.getInvoiceData(),5000);
+
+                    }
+                    console.log(response, "res");
+                    // let data = response.data;
+                    // this.setState({ invoiceData: data });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
     }
 
     onOptionChange = (id) => {
@@ -115,8 +152,6 @@ export default class InvoiceProcessing extends React.Component {
         let selectedData = [],
             data = this.state.selected,
             status = this.state.status;
-        console.log(this.state.comments, "comments");
-
 
         if (Object.keys(data).length > 0) {
             if (status != null) {
@@ -128,7 +163,7 @@ export default class InvoiceProcessing extends React.Component {
                     console.log(key, data[key]);
                 }
                 this.setInvoiceDataById(selectedData, this.state.status);
-                this.setState({ invoiceNum: '', disableFilter: false, disableInput: false, selected: {}, comments: {} });
+                this.setState({ invoiceNum: '', disableFilter: false, disableInput: false, selected: {} });
             } else {
                 Swal.fire({
                     type: 'error',
@@ -155,14 +190,15 @@ export default class InvoiceProcessing extends React.Component {
             comments: newComment
         });
     }
+
     render() {
         return (
             <div>
-                <div className="container-fluid">
-                    <div className="card" style={{ margin: '50px auto'}}>
-                        <div className="card-body">
-                            <h4 className="card-title" >INVOICE PROCESSING</h4>
-                            <hr />
+                <div className="card" style={{ margin: '50px auto' }}>
+                    <div className="card-body">
+                        <h4 className="card-title" >INVOICE PROCESSING</h4>
+                        <hr />
+                        <div className="container-fluid">
                             <div className="row">
                                 <div className="col-lg-6 col-md-4">
                                     <form className="form-inline">
@@ -180,6 +216,7 @@ export default class InvoiceProcessing extends React.Component {
                                                 <button
                                                     className="btn btn-primary"
                                                     type="button"
+                                                    style={{backgroundColor :"#87cefa" }}
                                                     onClick={this.getInvoiceDataByID}
                                                 >Go</button>
                                             </div>
@@ -193,37 +230,48 @@ export default class InvoiceProcessing extends React.Component {
                                             <select id="sortby" className="form-control" disabled={this.state.disableFilter} onChange={this.handleSort}>
                                                 <option>Status</option>
                                                 <option>All</option>
-                                                <option>Open</option>
-                                                <option>Approved</option>
-                                                <option>Disputed</option>
+                                                {/* <option>Open</option> */}
+                                                <option style={{ backgroundColor : "#00ff7f"}}>Approved</option>
+                                                <option style={{ backgroundColor : "#ff6347"}}>Disputed</option>
+                                                <option style={{ backgroundColor : "#f0e68c"}}>Pending</option>
                                             </select>
                                         </div>
                                     </form>
                                 </div>
+
                             </div>
-                            <div style={{ marginTop: '30px' }}>
+                            <div style={{ margin: ' 30px 30px 0px 30px' }}>
                                 <table className="table table-bordered">
-                                    <thead className="thead-light">
+                                    <thead className="thead-light" >
                                         <tr>
-                                            <th style={{ width: '50px' }}></th>
-                                            <th style={{ width: '120px' }}>Invoice No.</th>
-                                            <th style={{ width: '140px' }}>Invoice Date</th>
-                                            <th style={{ width: '295px' }}>Invoice Name</th>
-                                            <th style={{ width: '255px' }}>LoB</th>
-                                            <th style={{ width: '95px' }}>Quantity</th>
-                                            <th style={{ width: '90px' }}>Price</th>
-                                            <th style={{ width: '100px' }}>Status</th>
-                                            <th >Comments</th>
+                                            <th style={{ width: '50px', backgroundColor : "#f5deb3" ,color : "#8b4513"}}></th>
+                                            <th style={{ width: '120px' , backgroundColor : "#f5deb3",color : "#8b4513"}}>Invoice No.</th>
+                                            <th style={{ width: '140px' , backgroundColor : "#f5deb3",color : "#8b4513" }}>Invoice Date</th>
+                                            <th style={{ width: '295px' , backgroundColor : "#f5deb3",color : "#8b4513"}}>Invoice Name</th>
+                                            <th style={{ width: '255px' , backgroundColor : "#f5deb3",color : "#8b4513"}}>LoB</th>
+                                            <th style={{ width: '95px' , backgroundColor : "#f5deb3",color : "#8b4513"}}>Quantity</th>
+                                            <th style={{ width: '90px' , backgroundColor : "#f5deb3",color : "#8b4513"}}>Price</th>
+                                            <th style={{ width: '100px' , backgroundColor : "#f5deb3",color : "#8b4513"}}>Status</th>
+                                            <th style = {{backgroundColor :"#f5deb3",color : "#8b4513" }}>Comments</th>
                                         </tr>
                                     </thead>
                                 </table>
                             </div>
-                            <div style={{ marginTop: '-15px', maxHeight: '300px', overflowY: 'auto', borderBottom: '1px solid #dee2e6' }}>
-                                <table className="table table-bordered" style={{margin: '0px'}}>
+                            <div style={{ margin: '-15px 30px 0px 30px', height: '400px', overflowY: 'auto', borderBottom: '1px solid #dee2e6' }}>
+                                <table className="table table-bordered">
+
                                     <tbody >
+
+
                                         {this.state.invoiceData != null ?
                                             this.state.invoiceData.map((invoice, i) => {
                                                 let record = invoice.Record;
+                                                // console.log("record response", record)
+
+
+                                                if(record.status == "Not Approved"){
+                                                    record.status = "Disputed";
+                                                }
                                                 return (
                                                     <tr key={i} >
                                                         <td style={{ width: '50px' }}><input
@@ -237,18 +285,18 @@ export default class InvoiceProcessing extends React.Component {
                                                         <td style={{ width: '140px' }}>{record.invoiceDate}</td>
                                                         <td style={{ width: '295px' }}>{record.invoiceName}</td>
                                                         <td style={{ width: '255px' }}>{record.lob}</td>
-                                                        <td style={{ width: '95px' }}>{record.quantity}</td>
+                                                        <td style={{ width: '95px' }}>{record.quantiy}</td>
                                                         <td style={{ width: '90px' }}>{record.price}</td>
                                                         <td style={{ width: '100px' }}>{record.status}</td>
                                                         <td >
                                                             <input
                                                                 type="text"
-                                                                key={record.invoiceNo}
                                                                 className="form-control"
-                                                                id={record.invoiceNo}
+                                                                id="comments"
                                                                 placeholder="Enter comments here"
-                                                                value={this.state.comments[record.invoiceNo]}
-                                                                onChange={(e) => this.addComments(record.invoiceNo, e)} />
+                                                                name="comments"
+                                                                // value = {record.message}
+                                                                onChange={(e) => this.addComments(invoice.id, e)} />
                                                         </td>
                                                     </tr>
                                                 )
@@ -258,8 +306,9 @@ export default class InvoiceProcessing extends React.Component {
                                     </tbody>
                                 </table>
                             </div>
+
                             <div className="col-lg-12 mt-5 mb-3">
-                                <div className="row">
+                                <div className="row" >
                                     <div className="col-lg-6" style={{ textAlign: 'right' }}>
                                         <select id="statuschange" className="form-control" style={{ width: 'auto', margin: '0 0 0 auto' }} onChange={this.handleStatusChange}>
                                             <option>Change Status</option>
